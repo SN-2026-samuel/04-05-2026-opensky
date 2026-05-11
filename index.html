@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Painel de Voos Brasil</title>
+  <title>Painel de Voos — SIROS/ANAC</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -18,6 +18,7 @@
       --yellow:  #facc15;
       --orange:  #fb923c;
       --red:     #f87171;
+      --purple:  #a78bfa;
       --mono:    'Courier New', Courier, monospace;
     }
 
@@ -29,7 +30,7 @@
       padding: 1.5rem 1rem 3rem;
     }
 
-    /* ── Header ─────────────────────────────────────── */
+    /* ── Header ──────────────────────────────────────── */
     header {
       display: flex;
       flex-wrap: wrap;
@@ -45,7 +46,6 @@
       font-size: 1.35rem;
       font-weight: 700;
       color: var(--accent);
-      letter-spacing: .03em;
     }
 
     .header-left p {
@@ -54,14 +54,31 @@
       margin-top: 3px;
     }
 
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .anac-badge {
+      font-size: .7rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: rgba(74,222,128,.1);
+      color: var(--green);
+      border: 1px solid rgba(74,222,128,.2);
+      white-space: nowrap;
+    }
+
     .clock {
       font-family: var(--mono);
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--accent);
       letter-spacing: .1em;
     }
 
-    /* ── Painel de filtros ───────────────────────────── */
+    /* ── Filtros ─────────────────────────────────────── */
     .filters-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -96,7 +113,6 @@
     .filter-group label {
       font-size: .72rem;
       color: var(--muted);
-      letter-spacing: .04em;
     }
 
     select, .btn {
@@ -127,7 +143,6 @@
       height: 36px;
       background: var(--border);
       align-self: flex-end;
-      margin: 0 .25rem;
     }
 
     /* ── Meta bar ────────────────────────────────────── */
@@ -135,10 +150,9 @@
       font-size: .75rem;
       color: var(--muted);
       margin-bottom: 1.25rem;
-      min-height: 1.2em;
     }
 
-    /* ── Section ─────────────────────────────────────── */
+    /* ── Secao ───────────────────────────────────────── */
     .section-title {
       display: flex;
       align-items: center;
@@ -151,79 +165,110 @@
       margin-bottom: .5rem;
       margin-top: 1.6rem;
     }
+
     .arrow-in  { color: var(--green);  font-size: .95rem; }
     .arrow-out { color: var(--orange); font-size: .95rem; }
 
-    /* ── Table ───────────────────────────────────────── */
+    /* ── Tabela ──────────────────────────────────────── */
     .table-wrap { overflow-x: auto; }
 
-    table { width: 100%; border-collapse: collapse; font-size: .81rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .8rem; }
 
     thead th {
       background: var(--surface);
       color: var(--muted);
       font-weight: 600;
-      font-size: .68rem;
-      letter-spacing: .08em;
+      font-size: .67rem;
+      letter-spacing: .07em;
       text-transform: uppercase;
-      padding: .6rem .9rem;
+      padding: .6rem .75rem;
       text-align: left;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
     }
 
     tbody tr { border-bottom: 1px solid var(--border); }
-    tbody tr:hover { background: rgba(255,255,255,.025); }
+    tbody tr:hover { background: rgba(255,255,255,.02); }
 
     tbody td {
-      padding: .62rem .9rem;
+      padding: .6rem .75rem;
       white-space: nowrap;
       vertical-align: middle;
     }
 
-    .td-time    { font-family: var(--mono); font-size: .88rem; color: var(--accent); letter-spacing: .04em; }
+    .td-time    { font-family: var(--mono); font-size: .87rem; color: var(--accent); }
     .td-flight  { font-family: var(--mono); font-weight: 700; }
-    .td-airport { color: var(--muted); }
+    .td-muted   { color: var(--muted); font-size: .78rem; }
 
     /* ── Badges ──────────────────────────────────────── */
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 2px 9px;
+      padding: 2px 8px;
       border-radius: 99px;
-      font-size: .7rem;
+      font-size: .69rem;
       font-weight: 600;
     }
-    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
-    .badge-pousado, .badge-partiu  { background: rgba(74,222,128,.12); color: var(--green);  }
-    .badge-pousado .dot, .badge-partiu .dot { background: var(--green); }
     .badge-programado { background: rgba(250,204,21,.1);  color: var(--yellow); }
     .badge-programado .dot { background: var(--yellow); }
-    .badge-atrasado   { background: rgba(251,146,60,.12); color: var(--orange); }
-    .badge-atrasado .dot   { background: var(--orange); }
-    .badge-cancelado  { background: rgba(248,113,113,.12);color: var(--red);    }
-    .badge-em.voo, [class*='em-voo'] { background: rgba(56,189,248,.12); color: var(--accent); }
-    .badge-desviado   { background: rgba(167,139,250,.12); color: #a78bfa; }
-    .badge-cancelado .dot  { background: var(--red);    }
+    .badge-domestico  { background: rgba(56,189,248,.1);  color: var(--accent); }
+    .badge-inter      { background: rgba(167,139,250,.1); color: var(--purple); }
 
     .airline-pill {
-      display: inline-block;
-      font-size: .7rem;
+      font-size: .69rem;
       font-weight: 600;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 4px;
-      background: rgba(56,189,248,.1);
+      background: rgba(56,189,248,.08);
       color: var(--accent);
-      border: 1px solid rgba(56,189,248,.2);
+      border: 1px solid rgba(56,189,248,.18);
+    }
+
+    .seats-pill {
+      font-size: .68rem;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(74,222,128,.08);
+      color: var(--green);
     }
 
     .empty {
       text-align: center;
-      padding: 2.5rem 1rem;
+      padding: 2rem 1rem;
       color: var(--muted);
       font-size: .85rem;
+    }
+
+    /* ── Info cards aeroporto ────────────────────────── */
+    .airport-cards {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .airport-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .6rem 1rem;
+      font-size: .8rem;
+    }
+
+    .airport-card .label {
+      font-size: .65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 2px;
+    }
+
+    .airport-card .value {
+      font-weight: 600;
+      color: var(--text);
     }
 
     /* ── Footer ──────────────────────────────────────── */
@@ -246,10 +291,13 @@
 
   <header>
     <div class="header-left">
-      <h1 id="airport-name">Painel de Voos Brasil</h1>
-      <p id="airport-subtitle">Selecione um aeroporto abaixo</p>
+      <h1 id="airport-name">Painel de Voos — SIROS/ANAC</h1>
+      <p id="airport-subtitle">Dados oficiais do governo brasileiro · Selecione um aeroporto</p>
     </div>
-    <div class="clock" id="clock">--:--:--</div>
+    <div class="header-right">
+      <span class="anac-badge">✓ Fonte Oficial ANAC</span>
+      <div class="clock" id="clock">--:--:--</div>
+    </div>
   </header>
 
   <!-- Filtros -->
@@ -287,13 +335,11 @@
       </div>
 
       <div class="filter-group">
-        <label for="filter-status">Situação</label>
-        <select id="filter-status" onchange="render()">
+        <label for="filter-type">Operação</label>
+        <select id="filter-type" onchange="render()">
           <option value="">Todas</option>
-          <option value="pousado">Pousado / Partiu</option>
-          <option value="programado">Programado</option>
-          <option value="atrasado">Atrasado</option>
-          <option value="cancelado">Cancelado</option>
+          <option value="Domestico">Doméstico</option>
+          <option value="Internacional">Internacional</option>
         </select>
       </div>
 
@@ -301,101 +347,128 @@
     </div>
   </div>
 
+  <!-- Info cards -->
+  <div class="airport-cards" id="airport-cards" style="display:none">
+    <div class="airport-card">
+      <div class="label">ICAO</div>
+      <div class="value" id="card-icao">—</div>
+    </div>
+    <div class="airport-card">
+      <div class="label">Aeroporto</div>
+      <div class="value" id="card-nome">—</div>
+    </div>
+    <div class="airport-card">
+      <div class="label">Data referência</div>
+      <div class="value" id="card-data">—</div>
+    </div>
+    <div class="airport-card">
+      <div class="label">Chegadas</div>
+      <div class="value" id="card-chegadas">—</div>
+    </div>
+    <div class="airport-card">
+      <div class="label">Partidas</div>
+      <div class="value" id="card-partidas">—</div>
+    </div>
+  </div>
+
   <div id="meta-bar">Carregando lista de aeroportos...</div>
 
+  <!-- Chegadas -->
   <div class="section-title"><span class="arrow-in">↓</span> Chegadas</div>
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th>Horário</th><th>Voo</th><th>Companhia</th><th>Origem</th><th>Situação</th>
+        <th>Horário (BRT)</th>
+        <th>Voo</th>
+        <th>Companhia</th>
+        <th>Aeronave</th>
+        <th>Assentos</th>
+        <th>Origem</th>
+        <th>Operação</th>
       </tr></thead>
       <tbody id="tbody-chegadas">
-        <tr><td colspan="5" class="empty">Selecione um aeroporto para carregar os voos.</td></tr>
+        <tr><td colspan="7" class="empty">Selecione um aeroporto para carregar os voos.</td></tr>
       </tbody>
     </table>
   </div>
 
+  <!-- Partidas -->
   <div class="section-title"><span class="arrow-out">↑</span> Partidas</div>
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th>Horário</th><th>Voo</th><th>Companhia</th><th>Destino</th><th>Situação</th>
+        <th>Horário (BRT)</th>
+        <th>Voo</th>
+        <th>Companhia</th>
+        <th>Aeronave</th>
+        <th>Assentos</th>
+        <th>Destino</th>
+        <th>Operação</th>
       </tr></thead>
       <tbody id="tbody-partidas">
-        <tr><td colspan="5" class="empty">Selecione um aeroporto para carregar os voos.</td></tr>
+        <tr><td colspan="7" class="empty">Selecione um aeroporto para carregar os voos.</td></tr>
       </tbody>
     </table>
   </div>
 
   <footer>
-    <span>Dados: <a href="https://opensky-network.org" target="_blank">OpenSky Network</a></span>
-    <span>Janela: 48 h · Atualização: a cada 30 min via GitHub Actions</span>
-    <span><a href="https://github.com/SN-2026/04-05-2026-opensky" target="_blank">Ver no GitHub</a></span>
+    <span>Fonte: <a href="https://sas.anac.gov.br/sas/siros_api/" target="_blank">SIROS/ANAC</a> · Dados oficiais do governo brasileiro</span>
+    <span>Horários em BRT (UTC-3) · Atualização: 4× ao dia via GitHub Actions</span>
+    <span><a href="https://github.com/SN-2026/06-05-2026-siros" target="_blank">Ver no GitHub</a></span>
   </footer>
 
   <script>
-    /* ── Relógio ─────────────────────────────────────── */
+    /* ── Relogio ────────────────────── */
     function tick() {
       document.getElementById('clock').textContent =
         new Date().toLocaleTimeString('pt-BR');
     }
     tick(); setInterval(tick, 1000);
 
-    /* ── Estado global ───────────────────────────────── */
-    let airports = [];   // lista completa de airports.json
-    let rawData  = null; // dados do aeroporto selecionado
+    /* ── Estado global ──────────────── */
+    let airports = [];
+    let rawData  = null;
     let currentIcao = '';
 
-    /* ── Helpers ─────────────────────────────────────── */
-    function fmtTime(iso) {
+    /* ── Helpers ────────────────────── */
+    function fmtDateTime(iso) {
       if (!iso) return '—';
-      return new Date(iso).toLocaleTimeString('pt-BR', {
-        hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo'
-      });
-    }
-    function fmtDate(iso) {
-      if (!iso) return '—';
-      return new Date(iso).toLocaleDateString('pt-BR', {
-        day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo'
-      });
-    }
-    function guessStatus(flight, kind) {
-      // Usa status direto da API (AviationStack) se disponivel
-      if (flight.status) {
-        const map = { pousado:'pousado', partiu:'partiu', programado:'programado',
-                      cancelado:'cancelado', 'em voo':'em voo', desviado:'desviado' };
-        return map[flight.status] || flight.status;
-      }
-      // Fallback: estima pelo horario
-      if (!flight.time_iso) return 'programado';
-      const ts  = new Date(flight.time_iso).getTime();
-      const now = Date.now();
-      if (ts < now) return kind === 'arrival' ? 'pousado' : 'partiu';
-      return (ts - now) / 60000 <= 15 ? 'atrasado' : 'programado';
-    }
-    function statusBadge(s) {
-      const labels = { pousado:'Pousado', partiu:'Partiu', programado:'Programado',
-                       'em voo':'Em voo', desviado:'Desviado',
-                       atrasado:'Atrasado', cancelado:'Cancelado' };
-      return `<span class="badge badge-${s}"><span class="dot"></span>${labels[s]||s}</span>`;
+      try {
+        const d = new Date(iso);
+        return d.toLocaleTimeString('pt-BR', {
+          hour: '2-digit', minute: '2-digit',
+          timeZone: 'America/Sao_Paulo'
+        });
+      } catch { return iso; }
     }
 
-    /* ── Carregar airports.json ───────────────────────── */
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const [y, m, d] = iso.split('-');
+      return `${d}/${m}/${y}`;
+    }
+
+    function opBadge(tipo) {
+      if (!tipo) return '';
+      const isInt = tipo.toLowerCase().includes('inter');
+      return isInt
+        ? `<span class="badge badge-inter">✈ Internacional</span>`
+        : `<span class="badge badge-domestico">✈ Doméstico</span>`;
+    }
+
+    /* ── Selects cascata ────────────── */
     async function loadAirports() {
       try {
         const r = await fetch('data/airports.json');
         airports = await r.json();
-
-        // Popula estados (únicos, ordenados)
         const states = [...new Set(airports.map(a => a.state))].sort();
-        const selState = document.getElementById('sel-state');
-        selState.innerHTML = '<option value="">Todos os estados</option>';
+        const sel = document.getElementById('sel-state');
+        sel.innerHTML = '<option value="">Todos os estados</option>';
         states.forEach(s => {
           const o = document.createElement('option');
           o.value = o.textContent = s;
-          selState.appendChild(o);
+          sel.appendChild(o);
         });
-
         document.getElementById('meta-bar').textContent =
           `${airports.length} aeroportos disponíveis · Selecione estado → município → aeroporto`;
       } catch(e) {
@@ -403,47 +476,31 @@
       }
     }
 
-    /* ── Cascata de selects ──────────────────────────── */
     function onStateChange() {
-      const state   = document.getElementById('sel-state').value;
+      const state = document.getElementById('sel-state').value;
       const selCity = document.getElementById('sel-city');
       const selAp   = document.getElementById('sel-airport');
-
       selCity.innerHTML = '<option value="">Selecione o município</option>';
       selAp.innerHTML   = '<option value="">Selecione o município</option>';
       document.getElementById('btn-refresh').disabled = true;
       rawData = null; render();
-
       if (!state) return;
-
-      const cities = [...new Set(
-        airports.filter(a => a.state === state).map(a => a.city)
-      )].sort();
-
-      selCity.innerHTML = '<option value="">Selecione o município</option>';
+      const cities = [...new Set(airports.filter(a => a.state === state).map(a => a.city))].sort();
       cities.forEach(c => {
         const o = document.createElement('option');
         o.value = o.textContent = c;
         selCity.appendChild(o);
       });
-
-      // Se só houver uma cidade, seleciona automaticamente
-      if (cities.length === 1) {
-        selCity.value = cities[0];
-        onCityChange();
-      }
+      if (cities.length === 1) { selCity.value = cities[0]; onCityChange(); }
     }
 
     function onCityChange() {
-      const state  = document.getElementById('sel-state').value;
-      const city   = document.getElementById('sel-city').value;
-      const selAp  = document.getElementById('sel-airport');
-
+      const state = document.getElementById('sel-state').value;
+      const city  = document.getElementById('sel-city').value;
+      const selAp = document.getElementById('sel-airport');
       selAp.innerHTML = '<option value="">Selecione o aeroporto</option>';
       document.getElementById('btn-refresh').disabled = true;
-
       if (!city) return;
-
       const aps = airports.filter(a => a.state === state && a.city === city);
       aps.forEach(a => {
         const o = document.createElement('option');
@@ -451,12 +508,7 @@
         o.textContent = `${a.icao} – ${a.name}`;
         selAp.appendChild(o);
       });
-
-      // Se só houver um aeroporto, seleciona automaticamente
-      if (aps.length === 1) {
-        selAp.value = aps[0].icao;
-        onAirportChange();
-      }
+      if (aps.length === 1) { selAp.value = aps[0].icao; onAirportChange(); }
     }
 
     function onAirportChange() {
@@ -465,7 +517,7 @@
       if (icao) loadFlights();
     }
 
-    /* ── Carregar dados de voo ───────────────────────── */
+    /* ── Carregamento ───────────────── */
     async function loadFlights() {
       const icao = document.getElementById('sel-airport').value;
       if (!icao) return;
@@ -479,7 +531,7 @@
       try {
         const r = await fetch(`data/${icao}.json?nc=${Date.now()}`);
         if (!r.ok) throw new Error(
-          `Arquivo data/${icao}.json não encontrado (HTTP ${r.status}).\n` +
+          `data/${icao}.json não encontrado (HTTP ${r.status}). ` +
           `Execute o GitHub Actions para gerar os dados deste aeroporto.`
         );
         rawData = await r.json();
@@ -488,7 +540,15 @@
         document.getElementById('airport-name').textContent =
           ap ? `${ap.city} — ${ap.name}` : rawData.airport_name || icao;
         document.getElementById('airport-subtitle').textContent =
-          `ICAO: ${icao}${ap ? ' · ' + ap.state : ''} · janela: ${rawData.window_hours}h`;
+          `ICAO: ${icao}${ap ? ' · ' + ap.state : ''} · Fonte: SIROS/ANAC`;
+
+        // Cards
+        document.getElementById('card-icao').textContent      = icao;
+        document.getElementById('card-nome').textContent      = rawData.airport_name || icao;
+        document.getElementById('card-data').textContent      = fmtDate(rawData.data_referencia);
+        document.getElementById('card-chegadas').textContent  = rawData.arrivals.length;
+        document.getElementById('card-partidas').textContent  = rawData.departures.length;
+        document.getElementById('airport-cards').style.display = 'flex';
 
         const upd = rawData.updated_at
           ? new Date(rawData.updated_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
@@ -502,7 +562,7 @@
         document.getElementById('meta-bar').textContent = 'Erro: ' + e.message;
         ['tbody-chegadas','tbody-partidas'].forEach(id => {
           document.getElementById(id).innerHTML =
-            `<tr><td colspan="5" class="empty">${e.message}</td></tr>`;
+            `<tr><td colspan="7" class="empty">${e.message}</td></tr>`;
         });
       } finally {
         btn.disabled = false;
@@ -510,10 +570,11 @@
       }
     }
 
-    /* ── Filtro de companhia ─────────────────────────── */
     function populateAirlineFilter() {
       if (!rawData) return;
-      const airlines = new Set([...rawData.arrivals, ...rawData.departures].map(f => f.airline).filter(Boolean));
+      const airlines = new Set(
+        [...rawData.arrivals, ...rawData.departures].map(f => f.airline).filter(Boolean)
+      );
       const sel = document.getElementById('filter-airline');
       const cur = sel.value;
       sel.innerHTML = '<option value="">Todas</option>';
@@ -525,49 +586,51 @@
       });
     }
 
-    /* ── Renderização ────────────────────────────────── */
-    function renderTable(flights, tbodyId, kind) {
+    /* ── Renderizacao ───────────────── */
+    function renderTable(flights, tbodyId) {
       const tbody  = document.getElementById(tbodyId);
       const fAirl  = document.getElementById('filter-airline').value;
-      const fStat  = document.getElementById('filter-status').value;
+      const fType  = document.getElementById('filter-type').value;
 
       if (!rawData) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">Selecione um aeroporto.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">Selecione um aeroporto.</td></tr>';
         return;
       }
 
       const filtered = flights.filter(f => {
         if (fAirl && f.airline !== fAirl) return false;
-        if (fStat) {
-          const s = guessStatus(f, kind);
-          if (s !== fStat) return false;
-        }
+        if (fType && !f.tipo_operacao?.includes(fType)) return false;
         return true;
       });
 
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum voo para o filtro selecionado.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum voo para o filtro selecionado.</td></tr>';
         return;
       }
 
       tbody.innerHTML = filtered.map(f => {
-        const status = guessStatus(f, kind);
+        const horario = fmtDateTime(f.chegada_iso || f.partida_iso);
+        const assentos = f.assentos
+          ? `<span class="seats-pill">✦ ${f.assentos}</span>`
+          : '—';
         return `<tr>
-          <td class="td-time">${fmtDate(f.time_iso)} ${fmtTime(f.time_iso)}</td>
-          <td class="td-flight">${f.callsign}</td>
-          <td><span class="airline-pill">${f.airline}</span></td>
-          <td class="td-airport">${f.airport_name || f.airport || '—'}</td>
-          <td>${statusBadge(status)}</td>
+          <td class="td-time">${horario}</td>
+          <td class="td-flight">${f.callsign || '—'}</td>
+          <td><span class="airline-pill">${f.airline || '—'}</span></td>
+          <td class="td-muted">${f.equipamento || '—'}</td>
+          <td>${assentos}</td>
+          <td class="td-muted">${f.rota || '—'}</td>
+          <td>${opBadge(f.tipo_operacao)}</td>
         </tr>`;
       }).join('');
     }
 
     function render() {
-      renderTable(rawData?.arrivals   || [], 'tbody-chegadas', 'arrival');
-      renderTable(rawData?.departures || [], 'tbody-partidas', 'departure');
+      renderTable(rawData?.arrivals   || [], 'tbody-chegadas');
+      renderTable(rawData?.departures || [], 'tbody-partidas');
     }
 
-    /* ── Init ────────────────────────────────────────── */
+    /* ── Init ───────────────────────── */
     loadAirports();
     setInterval(() => { if (currentIcao) loadFlights(); }, 300000);
   </script>
